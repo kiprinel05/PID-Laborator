@@ -757,7 +757,19 @@ namespace Framework.ViewModel
             else
                 if (ColorInitialImage != null)
             {
-                MessageBox.Show("It is possible to binarize only grayscale images!");
+                List<string> labels = new List<string>
+            {
+                "Brightness", "Contrast"
+            };
+                DialogWindow dialog = new DialogWindow(_mainVM, labels);
+                dialog.ShowDialog();
+                List<double> values = dialog.GetValues();
+                byte alpha, beta;
+                alpha = (byte)values[0];
+                if (alpha < 0) alpha = 0;
+                beta = (byte)values[1];
+                ColorProcessedImage = Tools.AdjustContrastBrightness(ColorInitialImage, alpha, beta);
+                ProcessedImage = Convert(ColorProcessedImage);
             }
         }
 
