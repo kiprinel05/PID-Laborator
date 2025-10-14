@@ -257,5 +257,33 @@ namespace Algorithms.Tools
         }
 
         #endregion
+
+
+        #region Normalized Histogram
+
+        public static float[] NormalizedHistogram(Image<Gray, byte> inputImage)
+        {
+            float[] histogram = new float[256];
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    byte intensity = inputImage.Data[y, x, 0];
+                    histogram[intensity]++;
+                }
+            }
+
+            float totalPixels = inputImage.Width * inputImage.Height;
+            for (int i = 0; i < 256; i++)
+            {
+                histogram[i] /= totalPixels;
+            }
+
+            return histogram;
+        }
+
+
+        #endregion
     }
 }
