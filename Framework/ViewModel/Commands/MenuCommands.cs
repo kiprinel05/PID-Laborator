@@ -711,6 +711,56 @@ namespace Framework.ViewModel
         #endregion
 
         #region Pointwise operations
+
+        private ICommand _brightnessAndContrastCommand;
+
+        public ICommand BrightnessAndContrastCommand
+        {
+            get
+            {
+                if (_brightnessAndContrastCommand == null)
+                    _brightnessAndContrastCommand = new RelayCommand(BrightnessAndContrast);
+                return _brightnessAndContrastCommand;
+            }
+        }
+
+        private void BrightnessAndContrast(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+
+            if (GrayInitialImage != null)
+            {
+                List<string> labels = new List<string>
+            {
+                "Brightness", "Contrast"
+            };
+
+                DialogWindow dialog = new DialogWindow(_mainVM, labels);
+                dialog.ShowDialog();
+
+                List<double> values = dialog.GetValues();
+
+                byte alpha, beta;
+                alpha = (byte)values[0];
+                if (alpha < 0) alpha = 0;
+                beta = (byte)values[1];
+                GrayProcessedImage = Tools.AdjustContrastBrightness(GrayInitialImage, alpha, beta);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else
+                if (ColorInitialImage != null)
+            {
+                MessageBox.Show("It is possible to binarize only grayscale images!");
+            }
+        }
+
         #endregion
 
         #region Thresholding
@@ -767,7 +817,7 @@ namespace Framework.ViewModel
         }
         #endregion
 
-       
+
 
 
     }

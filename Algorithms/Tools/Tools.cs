@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using System;
 
 namespace Algorithms.Tools
 {
@@ -171,6 +172,41 @@ namespace Algorithms.Tools
             return result;
         }
 
+
+        #endregion
+
+        #region Contrast and Brightness Adjustment
+
+        public static Image<Gray, byte> AdjustContrastBrightness(Image<Gray, byte> inputImage, double alpha, int beta)
+        {
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    int newValue = (int)(alpha * inputImage.Data[y, x, 0] + beta);
+                    result.Data[y, x, 0] = (byte)Math.Max(0, Math.Min(255, newValue));
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> AdjustContrastBrightness(Image<Bgr, byte> inputImage, double alpha, int beta)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    for (int c = 0; c < 3; ++c)
+                    {
+                        int newValue = (int)(alpha * inputImage.Data[y, x, c] + beta);
+                        result.Data[y, x, c] = (byte)Math.Max(0, Math.Min(255, newValue));
+                    }
+                }
+            }
+            return result;
+        }
 
         #endregion
     }
