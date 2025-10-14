@@ -773,6 +773,63 @@ namespace Framework.ViewModel
             }
         }
 
+        private ICommand _gammaCommand;
+
+        public ICommand GammaCommand
+        {
+            get
+            {
+                if (_gammaCommand == null)
+                    _gammaCommand = new RelayCommand(Gamma);
+                return _gammaCommand;
+            }
+        }
+
+        private void Gamma(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+
+            if (GrayInitialImage != null)
+            {
+                List<string> labels = new List<string>
+            {
+                "Gamma"
+            };
+
+                DialogWindow dialog = new DialogWindow(_mainVM, labels);
+                dialog.ShowDialog();
+
+                List<double> values = dialog.GetValues();
+
+                byte gamma;
+                gamma = (byte)values[0];
+                GrayProcessedImage = Tools.Gamma(GrayInitialImage, gamma);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else
+                if (ColorInitialImage != null)
+            {
+                List<string> labels = new List<string>
+            {
+                "Gamma"
+            };
+                DialogWindow dialog = new DialogWindow(_mainVM, labels);
+                dialog.ShowDialog();
+                List<double> values = dialog.GetValues();
+                byte gamma;
+                gamma = (byte)values[0];
+                ColorProcessedImage = Tools.Gamma(ColorInitialImage, gamma);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
         #endregion
 
         #region Thresholding
