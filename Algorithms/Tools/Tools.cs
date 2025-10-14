@@ -214,34 +214,45 @@ namespace Algorithms.Tools
 
         public static Image<Gray, byte> Gamma(Image<Gray, byte> inputImage, double gamma)
         {
+            if (gamma < 0) gamma = 1;
+
             Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+
+            double factor = Math.Pow(255.0, 1.0 - gamma);
+
             for (int y = 0; y < inputImage.Height; ++y)
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    if(gamma < 0) gamma = 1;
-                    int newValue = (int)(255 * Math.Pow(inputImage.Data[y, x, 0] / 255.0, gamma));
+                    int newValue = (int)(factor * Math.Pow(inputImage.Data[y, x, 0], gamma));
                     result.Data[y, x, 0] = (byte)Math.Max(0, Math.Min(255, newValue));
                 }
             }
+
             return result;
         }
 
+
         public static Image<Bgr, byte> Gamma(Image<Bgr, byte> inputImage, double gamma)
         {
+            if (gamma < 0) gamma = 1;
+
             Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
+            double factor = Math.Pow(255.0, 1.0 - gamma);
+
             for (int y = 0; y < inputImage.Height; ++y)
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
                     for (int c = 0; c < 3; ++c)
                     {
-                        if (gamma < 0) gamma = 1;
-                        int newValue = (int)(255 * Math.Pow(inputImage.Data[y, x, c] / 255.0, gamma));
+                        int newValue = (int)(factor * Math.Pow(inputImage.Data[y, x, c], gamma));
                         result.Data[y, x, c] = (byte)Math.Max(0, Math.Min(255, newValue));
                     }
                 }
             }
+
             return result;
         }
 
