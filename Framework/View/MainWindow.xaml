@@ -170,13 +170,13 @@
                           Command="{Binding Path=MenuCommands.MirrorImageCommand}"
                           CommandParameter="{Binding ElementName=processedImageCanvas}"/>
                 <MenuItem Header="Rotate 90deg clockwise" 
-          Foreground="#1E1E1E"
-          Command="{Binding Path=MenuCommands.RotateClockwiseImageCommand}"
-          CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.RotateClockwiseImageCommand}"
+                          CommandParameter="{Binding ElementName=processedImageCanvas}"/>
                 <MenuItem Header="Rotate 90deg trigonometric" 
-Foreground="#1E1E1E"
-Command="{Binding Path=MenuCommands.RotateTrigonometricImageCommand}"
-CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.RotateTrigonometricImageCommand}"
+                          CommandParameter="{Binding ElementName=processedImageCanvas}"/>
                 <MenuItem Header="Convert to grayscale"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.ConvertImageToGrayscaleCommand}"
@@ -207,6 +207,11 @@ CommandParameter="{Binding ElementName=processedImageCanvas}"/>
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
 
+                <MenuItem Header="MinErr Threshold"
+                    Foreground="#1E1E1E"
+                    Command="{Binding Path=MenuCommands.MinErrThreshold}"
+                    CommandParameter="{Binding ElementName=processedImageCanvas}">
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="Filters" 

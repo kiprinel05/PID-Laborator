@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
+using System.Security.Cryptography;
 
 namespace Algorithms.Tools
 {
@@ -285,5 +286,72 @@ namespace Algorithms.Tools
 
 
         #endregion
+
+        #region Min Error Thresholding
+
+        public static Image<Gray, byte> MinErrorThresholding(Image<Gray, byte> inputImage)
+        {
+            float[] histogram = NormalizedHistogram(inputImage);
+            double n = inputImage.Width * inputImage.Height;
+
+            float[] p = new float[256];
+            for (byte k = 1; k < 255; k++)
+            {
+                p[k] = (float)(histogram[k] / n);
+            }
+
+            double minError = 10000;
+            byte optimalThreshold = 0;
+
+            for (byte t = 1; t < 255; t++)
+            {
+                double p1 = 0, p2 = 0;
+                double mu1 = 0, mu2 = 0;
+                double sigma1 = 0, sigma2 = 0;
+                for (byte k = 0; k <= t; k++)
+                {
+                    p1 += p[k];
+                    mu1 += k * p[k];
+                }
+                if (p1 > 0) mu1 /= p1; else mu1 = 0;
+
+                p2 = 1 - p1;
+                for(byte k = (byte)(t + 1); k < 255; k++)
+                {
+                    mu2 += k * p[k];
+                }
+                if (p2 > 0) mu2 /= p2; else mu2 = 0;
+                for (byte k = 0; k <= t; k++)
+                {
+                    sigma1 += ((k - mu1) * (k - mu1)) * p[k];
+                }
+                for (byte k = (byte)(t + 1); k < 255; k++)
+                {
+                    sigma2 += ((k - mu2) * (k - mu2)) * p[k];
+                }
+                if (p1 > 0) sigma1 /= p1; else sigma1 = 0;
+                if (p2 > 0) sigma2 /= p2; else sigma2 = 0;
+
+
+                double t1 = 0, t2 = 0, t3 = 0, t4 = 0;
+                if(sigma1 == 0) t1 = 0; else t1 = p1 * Math.Log(sigma1);
+                if (sigma2 == 0) t2 = 0; else t2 = p2 * Math.Log(sigma2);
+                if (p1 == 0) t3 = 0; else t3 = 2 * p1 * Math.Log(p1);
+                if (p2 == 0) t4 = 0; else t4 = 2 * p2 * Math.Log(p2);
+
+                double error = 1 + t1 + t2 - t3 - t4;
+
+                if (error < minError)
+                {
+                    minError = error;
+                    optimalThreshold = t;
+                }
+            }
+
+            return Binar(inputImage, optimalThreshold);
+        }
+
+        #endregion
+
     }
 }

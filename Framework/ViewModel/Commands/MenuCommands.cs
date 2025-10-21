@@ -833,6 +833,41 @@ namespace Framework.ViewModel
         #endregion
 
         #region Thresholding
+
+        private ICommand _minErrCommand;
+
+        public ICommand MinErrThreshold
+        {
+            get
+            {
+                if (_minErrCommand == null)
+                    _minErrCommand = new RelayCommand(MinErr);
+                return _minErrCommand;
+            }
+        }
+
+        private void MinErr(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.MinErrorThresholding(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                //ColorProcessedImage = Tools.MinErrorThresholding(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
         #endregion
 
         #region Filters
