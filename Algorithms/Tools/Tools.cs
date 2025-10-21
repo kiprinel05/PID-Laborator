@@ -265,22 +265,14 @@ namespace Algorithms.Tools
         public static float[] NormalizedHistogram(Image<Gray, byte> inputImage)
         {
             float[] histogram = new float[256];
-
             for (int y = 0; y < inputImage.Height; ++y)
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    byte intensity = inputImage.Data[y, x, 0];
-                    histogram[intensity]++;
+                    byte pixelValue = inputImage.Data[y, x, 0];
+                    histogram[pixelValue]++;
                 }
             }
-
-            float totalPixels = inputImage.Width * inputImage.Height;
-            for (int i = 0; i < 256; i++)
-            {
-                histogram[i] /= totalPixels;
-            }
-
             return histogram;
         }
 
@@ -334,10 +326,10 @@ namespace Algorithms.Tools
 
 
                 double t1 = 0, t2 = 0, t3 = 0, t4 = 0;
-                if(sigma1 == 0) t1 = 0; else t1 = p1 * Math.Log(sigma1);
-                if (sigma2 == 0) t2 = 0; else t2 = p2 * Math.Log(sigma2);
-                if (p1 == 0) t3 = 0; else t3 = 2 * p1 * Math.Log(p1);
-                if (p2 == 0) t4 = 0; else t4 = 2 * p2 * Math.Log(p2);
+                if(sigma1 <= 0) t1 = 0; else t1 = p1 * Math.Log(sigma1);
+                if (sigma2 <= 0) t2 = 0; else t2 = p2 * Math.Log(sigma2);
+                if (p1 <= 0) t3 = 0; else t3 = 2 * p1 * Math.Log(p1);
+                if (p2 <= 0) t4 = 0; else t4 = 2 * p2 * Math.Log(p2);
 
                 double error = 1 + t1 + t2 - t3 - t4;
 
