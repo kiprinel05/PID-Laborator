@@ -871,6 +871,43 @@ namespace Framework.ViewModel
         #endregion
 
         #region Filters
+
+        private double[,] filter = new double[3, 3] { { 0.1, 0.1, 0.1}, { 0.1, 0.2, 0.1 }, { 0.1, 0.1, 0.1} };
+        private double[,] filter_1 = new double[3, 1] { { 0.25 }, { 0.5 }, { 0.25 } };
+        private double[,] filter_2 = new double[1, 3] { { 0.25, 0.5, 0.25 } };
+
+        private ICommand _customFilter;
+        public ICommand CustomFilterCommand
+        {
+            get
+            {
+                if (_customFilter == null)
+                    _customFilter = new RelayCommand(CustomFilter);
+                return _customFilter;
+            }
+            set { _customFilter = value; }
+                
+        }
+
+        public void CustomFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+
+            if(GrayInitialImage != null)
+            {
+                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage, filter);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+                
+        }
+
+
+
         #endregion
 
         #region Morphological operations
@@ -884,6 +921,7 @@ namespace Framework.ViewModel
 
         #region Use processed image as initial image
         private ICommand _useProcessedImageAsInitialImageCommand;
+
         public ICommand UseProcessedImageAsInitialImageCommand
         {
             get
