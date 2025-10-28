@@ -45,7 +45,7 @@ namespace Algorithms.Sections
                         }
                     }
 
-                    resultImage.Data[y, x, 0] = (byte)(kernelValue + 0.5);
+                    resultImage.Data[y, x, 0] = (byte)Math.Max(0, Math.Min(255, (int)kernelValue));
                 }
             }
 

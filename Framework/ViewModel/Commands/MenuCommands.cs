@@ -900,7 +900,7 @@ namespace Framework.ViewModel
 
             if(GrayInitialImage != null)
             {
-                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage, filter);
+                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage, filter_2);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
                 
