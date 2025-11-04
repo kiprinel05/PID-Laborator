@@ -955,8 +955,6 @@ namespace Framework.ViewModel
 
         #endregion
 
-
-
         #endregion
 
         #region Morphological operations
