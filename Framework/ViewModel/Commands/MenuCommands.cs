@@ -900,11 +900,60 @@ namespace Framework.ViewModel
 
             if(GrayInitialImage != null)
             {
+
                 GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage, filter_2);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
-                
         }
+
+        #region Low Pass Filter 
+        
+        private ICommand _lowPassFilterCommand;
+        public ICommand LowPassFilterCommand
+        {
+            get
+            {
+                if (_lowPassFilterCommand == null)
+                    _lowPassFilterCommand = new RelayCommand(LowPassFilter);
+                return _lowPassFilterCommand;
+            }
+        }
+
+        private void LowPassFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+
+            List<string> labels = new List<string>
+            {
+                "SigmaX", "SigmaY"
+            };
+
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+
+            List<double> values = dialog.GetValues();
+
+            double sigmaX = values[0];
+            double sigmaY = values[1];
+            if (GrayInitialImage != null)
+            {
+
+                GrayProcessedImage = Filters.GaussFilter(GrayInitialImage, sigmaX, sigmaY);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Filters.GaussFilter(ColorInitialImage, sigmaX, sigmaY);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
 
 
 

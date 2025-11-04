@@ -51,5 +51,61 @@ namespace Algorithms.Sections
 
             return resultImage;
         }
+
+        #region Low Pass Filters 
+
+        private  static double[,] GaussMask(double sigmaX, double sigmaY)
+        {
+            int w = Math.Ceiling(4 * sigmaX) % 2 == 0 ? (int)(4 * sigmaX) + 1 : (int)(4 * sigmaX);
+            int h = Math.Ceiling(4 * sigmaY) % 2 == 0 ? (int)(4 * sigmaY) + 1 : (int)(4 * sigmaY);
+
+            double [,] gaussMask = new double[w, h];
+
+            for (int x = -w/2; x <= w / 2; x++)
+            {
+                for(int y = -h / 2; y <= h / 2; y++)
+                {
+                    double gauss = (1 / (2 * Math.PI * sigmaX * sigmaY)) * 
+                               Math.Exp(-(x * x / (2 * sigmaX * sigmaX) + y * y / (2 * sigmaY * sigmaY)));
+                    gaussMask[x + w / 2, y + h / 2] = gauss;
+                }
+            }
+
+            double sum = 0.0;
+            for (int i = 0; i < gaussMask.GetLength(0); i++)
+            {
+                for (int j = 0; j < gaussMask.GetLength(1); j++)
+                {
+                    sum += gaussMask[i, j];
+                }
+            }
+            for (int i = 0; i < gaussMask.GetLength(0); i++)
+            {
+                for (int j = 0; j < gaussMask.GetLength(1); j++)
+                {
+                    gaussMask[i, j] /= sum;
+                }
+            }
+            return gaussMask;
+
+        }
+
+        public static Image<Gray, byte> GaussFilter(Image<Gray, byte> initialImage, double sigmaX, double sigmaY)
+        {
+            double[,] gaussMask = GaussMask(sigmaX, sigmaY);
+            return ApplyFilter(initialImage, gaussMask);
+        }
+
+        public static Image<Bgr, byte> GaussFilter(Image<Bgr, byte> initialImage, double sigmaX, double sigmaY)
+        {
+            Image<Gray, byte>[] channels = initialImage.Split();
+            for (int i = 0; i < channels.Length; i++)
+            {
+                channels[i] = GaussFilter(channels[i], sigmaX, sigmaY);
+            }
+            return new Image<Bgr, byte>(channels);
+        }
+
+        #endregion
     }
-    }
+}
