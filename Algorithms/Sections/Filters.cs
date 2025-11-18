@@ -188,9 +188,9 @@ namespace Algorithms.Sections
                     }
                     else
                     {
-                        if (r_grad > 255) r_grad = 255;
-                        if (g_grad > 255) g_grad = 255;
-                        if (b_grad > 255) b_grad = 255;
+                        if (r_grad > 255) r_grad = 255; if(r_grad < 0) r_grad = 0;
+                        if (g_grad > 255) g_grad = 255; if(g_grad < 0) g_grad = 0;
+                        if (b_grad > 255) b_grad = 255; if(b_grad < 0) b_grad = 0;
 
                         resultImage.Data[y, x, 0] = (byte)r_grad;
                         resultImage.Data[y, x, 1] = (byte)g_grad;
