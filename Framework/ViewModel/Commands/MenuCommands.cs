@@ -953,6 +953,57 @@ namespace Framework.ViewModel
             }
         }
 
+
+        #endregion
+
+        #region 
+
+        private ICommand _prewittFilterCommand;
+
+        public ICommand PrewittFilterCommand
+
+        {
+            get
+            {
+                if (_prewittFilterCommand == null)
+                    _prewittFilterCommand = new RelayCommand(PrewittFilter);
+                return _prewittFilterCommand;
+            }
+
+        }
+            private void PrewittFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+
+            List<string> labels = new List<string>
+            {
+                "T"
+            };
+
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+
+            List<double> values = dialog.GetValues();
+
+            int T = (int)values[0];
+            if (GrayInitialImage != null)
+            {
+
+                GrayProcessedImage = Filters.PrewittFilter(GrayInitialImage, T);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Filters.PrewittFilter(ColorInitialImage, T);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
         #endregion
 
         #endregion

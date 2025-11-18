@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using OpenTK.Graphics.OpenGL;
 using System;
+using System.Runtime.Remoting.Channels;
 
 namespace Algorithms.Sections
 {
@@ -54,18 +56,18 @@ namespace Algorithms.Sections
 
         #region Low Pass Filters 
 
-        private  static double[,] GaussMask(double sigmaX, double sigmaY)
+        private static double[,] GaussMask(double sigmaX, double sigmaY)
         {
             int w = Math.Ceiling(4 * sigmaX) % 2 == 0 ? (int)(4 * sigmaX) + 1 : (int)(4 * sigmaX);
             int h = Math.Ceiling(4 * sigmaY) % 2 == 0 ? (int)(4 * sigmaY) + 1 : (int)(4 * sigmaY);
 
-            double [,] gaussMask = new double[w, h];
+            double[,] gaussMask = new double[w, h];
 
-            for (int x = -w/2; x <= w / 2; x++)
+            for (int x = -w / 2; x <= w / 2; x++)
             {
-                for(int y = -h / 2; y <= h / 2; y++)
+                for (int y = -h / 2; y <= h / 2; y++)
                 {
-                    double gauss = (1 / (2 * Math.PI * sigmaX * sigmaY)) * 
+                    double gauss = (1 / (2 * Math.PI * sigmaX * sigmaY)) *
                                Math.Exp(-(x * x / (2 * sigmaX * sigmaX) + y * y / (2 * sigmaY * sigmaY)));
                     gaussMask[x + w / 2, y + h / 2] = gauss;
                 }
@@ -104,6 +106,99 @@ namespace Algorithms.Sections
                 channels[i] = GaussFilter(channels[i], sigmaX, sigmaY);
             }
             return new Image<Bgr, byte>(channels);
+        }
+
+        #endregion
+
+        #region Prewitt Filter 
+
+        public static Image<Gray, byte> PrewittFilter(Image<Gray, byte> initialImage, int T)
+        {
+            double[,] prewittX = new double[,]
+            {
+                { -1, 0, 1 },
+                { -1, 0, 1 },
+                { -1, 0, 1 }
+            };
+            double[,] prewittY = new double[,]
+            {
+                { 1, 1, 1 },
+                { 0, 0, 0 },
+                { -1, -1, -1 }
+            };
+
+            Image<Gray, byte> gradientX = ApplyFilter(initialImage, prewittX);
+            Image<Gray, byte> gradientY = ApplyFilter(initialImage, prewittX);
+            Image<Gray, byte> resultImage = new Image<Gray, byte>(initialImage.Width, initialImage.Height);
+            for (int y = 0; y < resultImage.Height; y++)
+            {
+                for (int x = 0; x < resultImage.Width; x++)
+                {
+                    double n_grad = Math.Sqrt(
+                        gradientX.Data[y, x, 0] * gradientX.Data[y, x, 0] +
+                        gradientY.Data[y, x, 0] * gradientY.Data[y, x, 0]);
+                    resultImage.Data[y, x, 0] = (byte)(n_grad <= T ? 0 : 255);
+                }
+            }
+            return resultImage;
+        }
+
+        public static Image<Bgr, byte> PrewittFilter(Image<Bgr, byte> initialImage, double T)
+        {
+            double[,] prewittX = new double[,]
+            {
+                { -1, 0, 1 },
+                { -1, 0, 1 },
+                { -1, 0, 1 }
+            };
+            double[,] prewittY = new double[,]
+            {
+                { 1, 1, 1 },
+                { 0, 0, 0 },
+                { -1, -1, -1 }
+            };
+
+
+            Image<Gray, byte> Rx = ApplyFilter(initialImage.Split()[0], prewittX);
+            Image<Gray, byte> Gx = ApplyFilter(initialImage.Split()[1], prewittX);
+            Image<Gray, byte> Bx = ApplyFilter(initialImage.Split()[2], prewittX);
+
+            Image<Gray, byte> Ry = ApplyFilter(initialImage.Split()[0], prewittY);
+            Image<Gray, byte> Gy = ApplyFilter(initialImage.Split()[1], prewittY);
+            Image<Gray, byte> By = ApplyFilter(initialImage.Split()[2], prewittY);
+
+
+            Image<Bgr, byte> resultImage = new Image<Bgr, byte>(initialImage.Width, initialImage.Height);
+
+            for (int y = 0; y < initialImage.Height; y++)
+            {
+                for (int x = 0; x < initialImage.Width; x++)
+                {
+                    double r_grad = Math.Sqrt(Rx.Data[y, x, 0] * Rx.Data[y, x, 0] + Ry.Data[y, x, 0] * Ry.Data[y, x, 0]);
+                    double g_grad = Math.Sqrt(Gx.Data[y, x, 0] * Gx.Data[y, x, 0] + Gy.Data[y, x, 0] * Gy.Data[y, x, 0]);
+                    double b_grad = Math.Sqrt(Bx.Data[y, x, 0] * Bx.Data[y, x, 0] + By.Data[y, x, 0] * By.Data[y, x, 0]);
+
+                    double sum = r_grad + g_grad * b_grad;
+
+                    if (sum <= T)
+                    {
+                        resultImage.Data[y, x, 0] = 0;
+                        resultImage.Data[y, x, 1] = 0;
+                        resultImage.Data[y, x, 2] = 0;
+                    }
+                    else
+                    {
+                        if (r_grad > 255) r_grad = 255;
+                        if (g_grad > 255) g_grad = 255;
+                        if (b_grad > 255) b_grad = 255;
+
+                        resultImage.Data[y, x, 0] = (byte)r_grad;
+                        resultImage.Data[y, x, 1] = (byte)g_grad;
+                        resultImage.Data[y, x, 2] = (byte)b_grad;
+                    }
+                }
+            }
+            return resultImage.Convert<Bgr, byte>();
         }
 
         #endregion
