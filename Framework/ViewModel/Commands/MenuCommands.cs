@@ -1,23 +1,21 @@
-﻿using Emgu.CV;
+﻿using Algorithms.Sections;
+using Algorithms.Tools;
+using Algorithms.Utilities;
+using Emgu.CV;
 using Emgu.CV.Structure;
-
-using System.Windows;
+using Framework.View;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Controls;
-using System.Collections.Generic;
-
-using Framework.View;
+using static Framework.Converters.ImageConverter;
 using static Framework.Utilities.DataProvider;
 using static Framework.Utilities.DrawingHelper;
 using static Framework.Utilities.FileHelper;
-using static Framework.Converters.ImageConverter;
-
-using Algorithms.Sections;
-using Algorithms.Tools;
-using Algorithms.Utilities;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Framework.ViewModel
 {
@@ -872,7 +870,7 @@ namespace Framework.ViewModel
 
         #region Filters
 
-        private double[,] filter = new double[3, 3] { { 0.1, 0.1, 0.1}, { 0.1, 0.2, 0.1 }, { 0.1, 0.1, 0.1} };
+        private double[,] filter = new double[3, 3] { { 0.1, 0.1, 0.1 }, { 0.1, 0.2, 0.1 }, { 0.1, 0.1, 0.1 } };
         private double[,] filter_1 = new double[3, 1] { { 0.25 }, { 0.5 }, { 0.25 } };
         private double[,] filter_2 = new double[1, 3] { { 0.25, 0.5, 0.25 } };
 
@@ -886,7 +884,7 @@ namespace Framework.ViewModel
                 return _customFilter;
             }
             set { _customFilter = value; }
-                
+
         }
 
         public void CustomFilter(object parameter)
@@ -898,7 +896,7 @@ namespace Framework.ViewModel
             }
             ClearProcessedCanvas(parameter as Canvas);
 
-            if(GrayInitialImage != null)
+            if (GrayInitialImage != null)
             {
 
                 GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage, filter_2);
@@ -907,7 +905,7 @@ namespace Framework.ViewModel
         }
 
         #region Low Pass Filter 
-        
+
         private ICommand _lowPassFilterCommand;
         public ICommand LowPassFilterCommand
         {
@@ -971,7 +969,7 @@ namespace Framework.ViewModel
             }
 
         }
-            private void PrewittFilter(object parameter)
+        private void PrewittFilter(object parameter)
         {
             if (InitialImage == null)
             {
@@ -1058,7 +1056,165 @@ namespace Framework.ViewModel
         #endregion
 
 
+        #region Dilate 
 
+        private ICommand _dilateCommand;
+        public ICommand DilateCommand
+        {
+            get
+            {
+                if (_dilateCommand == null)
+                    _dilateCommand = new RelayCommand(DilateImage);
+                return _dilateCommand;
+            }
+        }
+
+        private void DilateImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+
+            List<string> labels = new List<string>
+            {
+                "w", "h", "T"
+            };
+
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+
+            List<double> values = dialog.GetValues();
+
+            int w = (int)values[0];
+            int h = (int)values[1];
+            int T = (int)values[2];
+            if (GrayInitialImage != null)
+            {
+
+                GrayProcessedImage = MorphologicalOperations.Dilate(GrayInitialImage, w, h, T, true);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }
+        #endregion
+
+        #region Erode
+
+        private ICommand _erodeCommand;
+        public ICommand ErodeCommand
+        {
+            get
+            {
+                if (_erodeCommand == null)
+                    _erodeCommand = new RelayCommand(ErodeImage);
+                return _erodeCommand;
+            }
+        }
+
+        private void ErodeImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            List<string> labels = new List<string>
+            {
+                "w", "h", "T"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            int w = (int)values[0];
+            int h = (int)values[1];
+            int T = (int)values[2];
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = MorphologicalOperations.Erode(GrayInitialImage, w, h, T, true);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }
+
+        #endregion
+
+        #region Open
+
+        private ICommand _openCommand;
+        public ICommand OpenCommand
+        {
+            get
+            {
+                if (_openCommand == null)
+                    _openCommand = new RelayCommand(OpenImage);
+                return _openCommand;
+            }
+        }
+
+        private void OpenImage(object parameter) { 
+        if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+        List<string> labels = new List<string>
+            {
+                "w", "h", "T"
+            };
+        DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+                int w = (int)values[0];
+                int h = (int)values[1];
+                int T = (int)values[2];
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = MorphologicalOperations.Open(GrayInitialImage, w, h, T, true);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }
+        #endregion
+
+        #region Close
+
+        private ICommand _closeCommand;
+        public ICommand CloseCommand
+        {
+            get
+            {
+                if (_closeCommand == null)
+                    _closeCommand = new RelayCommand(CloseImage);
+                return _closeCommand;
+            }
+        }
+        private void CloseImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            List<string> labels = new List<string>
+            {
+                "w", "h", "T"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            int w = (int)values[0];
+            int h = (int)values[1];
+            int T = (int)values[2];
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = MorphologicalOperations.Close(GrayInitialImage, w, h, T, true);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }
+        #endregion
 
     }
 }
