@@ -2,6 +2,9 @@
 using Emgu.CV.Structure;
 using System;
 using System.Drawing;
+using System;
+using System.Collections.Generic;
+
 
 namespace Algorithms.Sections
 {
@@ -82,6 +85,59 @@ namespace Algorithms.Sections
             Image<Gray, byte> dilated = Dilate(inputImage, w, h, T, white);
             Image<Gray, byte> closed = Erode(dilated, w, h, T, white);
             return closed;
+        }
+
+        public static Image<Bgr, byte> ConnectedComponents(Image<Bgr, byte> inputImage)
+        {
+            Image<Bgr, byte> binary = Tools.Tools.MinErrorThresholding(inputImage);
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Width, inputImage.Height);
+
+            bool[,] visited = new bool[inputImage.Height, inputImage.Width];
+            int label = 1;
+            Random rand = new Random();
+
+            for(int y = 0; y < inputImage.Height; y++)
+            {
+                for (int x = 0; x < inputImage.Width; x++)
+                {
+                    if (binary.Data[y, x, 0] == 255 && !visited[y, x])
+                    {
+                        Tuple<int, int> point = new Tuple<int, int>(x, y);
+                        Queue<Tuple<int, int>> queue = new Queue<Tuple<int, int>>();
+                        queue.Enqueue(point);
+                        visited[y, x] = true;
+                        Bgr color = new Bgr(rand.Next(256), rand.Next(256), rand.Next(256));
+                        while (queue.Count > 0)
+                        {
+                            Tuple<int, int> current = queue.Dequeue();
+                            result.Data[current.Item2, current.Item1, 0] = (byte)color.Blue;
+                            result.Data[current.Item2, current.Item1, 1] = (byte)color.Green;
+                            result.Data[current.Item2, current.Item1, 2] = (byte)color.Red;
+                            for(int i = -1; i <= 1; i++)
+                            {
+                                for(int j = -1; j <= 1; j++)
+                                {
+                                    int newX = current.Item1 + j;
+                                    int newY = current.Item2 + i;
+                                    if (newX >= 0 && newX < inputImage.Width && newY >= 0 && newY < inputImage.Height)
+                                    {
+                                        if (binary.Data[newY, newX, 0] == 255 && !visited[newY, newX])
+                                        {
+                                            Tuple<int, int> newPoint = new Tuple<int, int>(newX, newY);
+                                            queue.Enqueue(newPoint);
+                                            visited[newY, newX] = true;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                        label++;
+                    }
+                }
+            }
+            return result;
         }
     }
 }

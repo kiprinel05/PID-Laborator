@@ -343,6 +343,25 @@ namespace Algorithms.Tools
             return Binar(inputImage, optimalThreshold);
         }
 
+        public static Image<Bgr, byte> MinErrorThresholding(Image<Bgr, byte> inputImage)
+        {
+            Image<Gray, byte> grayImage = Convert(inputImage);
+            Image<Gray, byte> binaryImage = MinErrorThresholding(grayImage);
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(binaryImage.Size);
+            for (int y = 0; y < binaryImage.Height; ++y)
+            {
+                for (int x = 0; x < binaryImage.Width; ++x)
+                {
+                    byte pixelValue = binaryImage.Data[y, x, 0];
+                    result.Data[y, x, 0] = pixelValue;
+                    result.Data[y, x, 1] = pixelValue;
+                    result.Data[y, x, 2] = pixelValue;
+                }
+            }
+            return result;
+        }
+
         #endregion
 
     }

@@ -1216,5 +1216,42 @@ namespace Framework.ViewModel
         }
         #endregion
 
+        #region Connected components
+
+        private ICommand _connectedComponentsCommand;
+
+        public ICommand ConnectedComponentsCommand
+        {
+            get
+            {
+                if (_connectedComponentsCommand == null)
+                    _connectedComponentsCommand = new RelayCommand(ConnectedComponents);
+                return _connectedComponentsCommand;
+            }
+        }
+
+        private void ConnectedComponents(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            
+            if (GrayInitialImage != null)
+            {
+                //GrayProcessedImage = MorphologicalOperations.ConnectedComponents(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = MorphologicalOperations.ConnectedComponents(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
+
     }
 }
