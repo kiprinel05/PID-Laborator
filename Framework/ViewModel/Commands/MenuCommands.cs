@@ -1238,20 +1238,112 @@ namespace Framework.ViewModel
                 return;
             }
             ClearProcessedCanvas(parameter as Canvas);
-            
+            List<string> labels = new List<string>
+            {
+                "w", "h"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            double w = values[0];
+            double h = values[1];
             if (GrayInitialImage != null)
             {
-                //GrayProcessedImage = MorphologicalOperations.ConnectedComponents(GrayInitialImage);
+                GrayProcessedImage = GeometricTransformations.BiliniarScale(GrayInitialImage, w, h);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
             else if (ColorInitialImage != null)
             {
-                ColorProcessedImage = MorphologicalOperations.ConnectedComponents(ColorInitialImage);
+                ColorProcessedImage = GeometricTransformations.BiliniarScale(ColorInitialImage, w, h);
                 ProcessedImage = Convert(ColorProcessedImage);
             }
         }
 
         #endregion
 
+        #region Biliniar Scale
+
+        private ICommand _biliniarScaleCommand;
+        public ICommand BiliniarScaleCommand
+        {
+            get
+            {
+                if (_biliniarScaleCommand == null)
+                    _biliniarScaleCommand = new RelayCommand(BiliniarScaleImage);
+                return _biliniarScaleCommand;
+            }
+        }
+        private void BiliniarScaleImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            List<string> labels = new List<string>
+            {
+                "w", "h"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            double w = values[0];
+            double h = values[1];
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = GeometricTransformations.BiliniarScale(GrayInitialImage, w, h);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = GeometricTransformations.BiliniarScale(ColorInitialImage, w, h);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
+
+        #region Bicubic Scale
+
+        private ICommand _bicubicScaleCommand;
+        public ICommand BicubicScaleCommand
+        {
+            get
+            {
+                if (_bicubicScaleCommand == null)
+                    _bicubicScaleCommand = new RelayCommand(BicubicScaleImage);
+                return _bicubicScaleCommand;
+            }
+        }
+        private void BicubicScaleImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            List<string> labels = new List<string>
+            {
+                "w", "h"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            double w = values[0];
+            double h = values[1];
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = GeometricTransformations.BicubicScale(GrayInitialImage, w, h);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = GeometricTransformations.BicubicScale(ColorInitialImage, w, h);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
     }
+
 }
