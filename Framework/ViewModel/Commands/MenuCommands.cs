@@ -1344,6 +1344,49 @@ namespace Framework.ViewModel
             }
         }
         #endregion
+
+        #region KMeans
+
+        private ICommand _kMeansCommand;
+
+        public ICommand KMeansCommand
+        {
+            get
+            {
+                if (_kMeansCommand == null)
+                    _kMeansCommand = new RelayCommand(KMeans);
+                return _kMeansCommand;
+            }
+        }
+        private void KMeans(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            ClearProcessedCanvas(parameter as Canvas);
+            List<string> labels = new List<string>
+            {
+                "k"
+            };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+            List<double> values = dialog.GetValues();
+            int k = (int)values[0];
+            if (GrayInitialImage != null)
+            {
+                //GrayProcessedImage = Segmentation.KMeans(GrayInitialImage, k);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Segmentation.KMeans(ColorInitialImage, k);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
     }
 
 }
